@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, Admin</h1>
+        <p>You have admin access.</p>
+
+        <!-- Admin Controls -->
+        <div id="admin-controls">
+            <button onclick="manageUsers()">Manage Users</button>
+            <button onclick="viewReports()">View Reports</button>
+            <button onclick="settings()">Settings</button>
+        </div>
+
+        <button id="logout">Logout</button>
+    </div>
+
+    <!-- ✅ Firebase SDK Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- ✅ Firebase Configuration -->
+    <script src="firebase-config.js"></script>
+
+    <!-- ✅ Admin Panel Logic -->
+    <script>
+        // Ensure Firebase is loaded
+        if (typeof firebase !== "undefined") {
+            console.log("✅ Firebase SDK loaded!");
+        } else {
+            console.error("❌ Firebase SDK not loaded. Check script order!");
+        }
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Logout Function
+        document.getElementById("logout").addEventListener("click", () => {
+            auth.signOut().then(() => {
+                console.log("✅ Admin logged out.");
+                window.location.href = "index.html";
+            }).catch(error => {
+                console.error("❌ Logout Error:", error);
+            });
+        });
+
+        // Authentication & Role Handling
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                db.collection("users").doc(user.uid).get().then(doc => {
+                    if (doc.exists && doc.data().role === "admin") {
+                        console.log("✅ Admin access confirmed.");
+                    } else {
+                        console.log("❌ Unauthorized access! Redirecting...");
+                        window.location.href = "index.html";
+                    }
+                }).catch(error => {
+                    console.error("❌ Firestore Error:", error);
+                });
+            } else {
+                console.log("❌ No user logged in. Redirecting to login...");
+                window.location.href = "index.html";
+            }
+        });
+
+        // Placeholder functions for admin actions
+        function manageUsers() {
+            alert("User management coming soon!");
+        }
+
+        function viewReports() {
+            alert("Report viewing coming soon!");
+        }
+
+        function settings() {
+            alert("Settings coming soon!");
+        }
+    </script>
+</body>
+</html>
